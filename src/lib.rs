@@ -4,6 +4,9 @@ mod pin_code;
 mod tower_builder;
 mod high_word_score;
 mod convert_string_to_camel_case;
+mod create_phone_number;
+mod pangram;
+mod observed_pin;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
