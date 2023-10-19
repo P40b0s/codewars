@@ -1,4 +1,4 @@
-use std::{sync::{Arc, Mutex, mpsc::channel}, thread};
+use std::{sync::{Arc, Mutex, mpsc::channel}, thread, time::Duration};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 
@@ -23,9 +23,11 @@ fn sum(ints: &[i8], s: i8) -> Option<(i8, i8)>
     results.sort_by_key(|s|s.0);
     results.first().and_then(|a| Some(a.1))
 }
+use std::time::Instant;
 
 fn sum2(ints: &[i8], s: i8) -> Option<(i8, i8)> 
 {
+    let now = Instant::now();
     let mut results: Vec<(usize, (i8, i8))> = vec![];
     let br = Arc::new(Mutex::new(false));
     let (tx, rx) = channel::<(usize, (i8, i8))>();
@@ -34,6 +36,11 @@ fn sum2(ints: &[i8], s: i8) -> Option<(i8, i8)>
         if *br.lock().unwrap() == true
         {
             break;
+        }
+        if now.elapsed() > Duration::from_secs(10)
+        {
+            results.sort_by_key(|s|s.0);
+            return results.first().and_then(|a| Some(a.1));
         }
         let br = Arc::clone(&br);
         let tx_cloned = tx.clone();
@@ -63,6 +70,31 @@ fn sum2(ints: &[i8], s: i8) -> Option<(i8, i8)>
     while let Ok(r) = rx.try_recv()
     {
         results.push(r);
+    }
+    results.sort_by_key(|s|s.0);
+    results.first().and_then(|a| Some(a.1))
+}
+
+fn sum3(ints: &[i8], s: i8) -> Option<(i8, i8)> 
+{
+    let mut results: Vec<(usize, (i8, i8))> = vec![];
+    for (i, num) in ints.iter().enumerate()
+    {
+        if let Ok(n) = ints[(i+1)..].binary_search_by(|b| (b+num).cmp(&s))
+        {
+            results.push((n, (*num, ints[n])));
+        }
+        // for ind in (i+1)..ints.len()
+        // {
+        //     if results.iter().any(|a| a.0 < ind)
+        //     {
+        //         break 'outer;
+        //     }
+        //     if num + ints[ind] == s
+        //     {
+        //         results.push((ind, (*num, ints[ind])));
+        //     }
+        // }
     }
     results.sort_by_key(|s|s.0);
     results.first().and_then(|a| Some(a.1))

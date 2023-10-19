@@ -9,6 +9,7 @@ mod pangram;
 mod observed_pin;
 mod order_please;
 mod sum_of_pairs;
+mod multiplying_numbers_as_strings;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
