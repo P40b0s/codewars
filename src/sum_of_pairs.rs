@@ -1,4 +1,4 @@
-use std::{sync::{Arc, Mutex, mpsc::channel, atomic::ATOMIC_BOOL_INIT}, thread};
+use std::{sync::{Arc, Mutex, mpsc::channel}, thread};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 
@@ -27,9 +27,15 @@ fn sum(ints: &[i8], s: i8) -> Option<(i8, i8)>
 fn sum2(ints: &[i8], s: i8) -> Option<(i8, i8)> 
 {
     let mut results: Vec<(usize, (i8, i8))> = vec![];
+    let br = Arc::new(Mutex::new(false));
     let (tx, rx) = channel::<(usize, (i8, i8))>();
     for (i, num) in ints.iter().enumerate()
     {
+        if *br.lock().unwrap() == true
+        {
+            break;
+        }
+        let br = Arc::clone(&br);
         let tx_cloned = tx.clone();
         thread::scope(|sc|
         {
@@ -40,6 +46,8 @@ fn sum2(ints: &[i8], s: i8) -> Option<(i8, i8)>
                 {
                     if results.iter().any(|a| a < &ind)
                     {
+                        let mut b = br.lock().unwrap();
+                        *b = true;
                         break;
                     }
                     if num + ints[ind] == s
