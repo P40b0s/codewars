@@ -5,15 +5,15 @@ use once_cell::sync::Lazy;
 fn pangram(sent: &str) -> bool
 {
     let abc_len = 26;
-    let mut chars: Vec<char> = Vec::new();
+    let mut hm = HashMap::new();
     for ch in sent.to_lowercase().chars()
     {
-        if ch.is_ascii_alphabetic() && !chars.contains(&ch)
+        if ch.is_ascii_alphabetic()
         {
-            chars.push(ch);
+            hm.insert(ch, ch);
         }
     }
-    chars.len() == abc_len
+    hm.len() == abc_len
 } // returns "(123) 456-7890"
 
 
@@ -24,7 +24,7 @@ mod tests
     #[test]
     fn test_builder()
     {
-        let f = super::pangram("abcdefghijklmopqrstuvwxyz");
+        let f = super::pangram("Pack my box with five dozen liquor jugs.");
         println!("{}", f)
       
     }

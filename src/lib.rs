@@ -7,6 +7,8 @@ mod convert_string_to_camel_case;
 mod create_phone_number;
 mod pangram;
 mod observed_pin;
+mod order_please;
+mod sum_of_pairs;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
