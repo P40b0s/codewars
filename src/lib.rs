@@ -11,6 +11,7 @@ mod order_please;
 mod sum_of_pairs;
 mod multiplying_numbers_as_strings;
 mod snail_sort;
+mod sudoku;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
